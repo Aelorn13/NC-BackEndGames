@@ -40,3 +40,30 @@ describe("/api/not-a-real-path", () => {
       });
   });
 });
+describe("/api/reviews", () => {
+  test("GET - 200: responds with an array of reviews each item in array have required keys and count of comments for each review", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          reviews: expect.any(Array),
+        });
+        expect(res.body.reviews.length).toBe(13);
+
+        res.body.reviews.forEach((review) => {
+          expect(review).toEqual({
+            review_id: expect.any(Number),
+            title: expect.any(String),
+            owner: expect.any(String),
+            category: expect.any(String),
+            review_img_url: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            designer: expect.any(String),
+            comment_count: expect.any(String),
+          });
+        });
+      });
+  });
+});
