@@ -38,30 +38,32 @@ exports.fetchReviewCommentsById = (review_id) => {
   });
 };
 exports.insertComment = (comment, review_id) => {
-  //check for username existing?
   const { username, body } = comment;
   if (!username || !body) {
     return Promise.reject({ status: 406, msg: "body misses required keys" });
   }
-  return fetchUsers().then((usersArr) => {
-    let flag = false;
-    for (const user of usersArr) {
-      if (user.username === username) {
-        flag = true;
-        break;
+  return fetchUsers()
+    .then((usersArr) => {
+      let flag = false;
+      for (const user of usersArr) {
+        if (user.username === username) {
+          flag = true;
+          break;
+        }
       }
-    }
-    if (flag === false) {
-      return Promise.reject({ status: 406, msg: "this user does not exist" });
-    }
-
-    return db
-      .query(
-        `INSERT INTO comments(body, author, review_id) VALUES ($1, $2, $3) RETURNING *;`,
-        [body, username, review_id]
-      )
-      .then((result) => {
-        return result.rows[0];
-      });
-  });
+      return flag;
+    })
+    .then((flag) => {
+      if (flag === false) {
+        return Promise.reject({ status: 406, msg: "this user does not exist" });
+      } else {
+        return db.query(
+          `INSERT INTO comments(body, author, review_id) VALUES ($1, $2, $3) RETURNING *;`,
+          [body, username, review_id]
+        );
+      }
+    })
+    .then((result) => {
+      return result.rows[0];
+    });
 };
