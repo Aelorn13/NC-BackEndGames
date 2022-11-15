@@ -25,14 +25,14 @@ exports.fetchReviewById = (review_id) => {
 };
 
 exports.fetchReviewCommentsById = (review_id) => {
-  return db
-    .query(`SELECT * FROM comments where review_id = $1 ORDER BY created_at;`, [
-      review_id,
-    ])
-    .then((result) => {
-      if (result.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "review does not exist" });
-      }
-      return result.rows;
-    });
+  return this.fetchReviewById(review_id).then(() => {
+    return db
+      .query(
+        `SELECT * FROM comments where review_id = $1 ORDER BY created_at;`,
+        [review_id]
+      )
+      .then((result) => {
+        return result.rows;
+      });
+  });
 };

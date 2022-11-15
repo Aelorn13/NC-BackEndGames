@@ -107,6 +107,7 @@ describe("/api/reviews/:review_id", () => {
       });
   });
 });
+
 describe("/api/reviews/:review_id/comments", () => {
   test("GET - 200: responds with an array of comments", () => {
     return request(app)
@@ -121,13 +122,24 @@ describe("/api/reviews/:review_id/comments", () => {
         res.body.comments.forEach((review) => {
           expect(review).toEqual({
             comment_id: expect.any(Number),
-            review_id: expect.any(Number),
+            review_id: 2,
             body: expect.any(String),
             author: expect.any(String),
             created_at: expect.any(String),
             votes: expect.any(Number),
           });
         });
+      });
+  });
+  test("GET - 200: responds with an empty array if reviews does not have any comments", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          comments: expect.any(Array),
+        });
+        expect(res.body.comments.length).toBe(0);
       });
   });
   test("GET:404 sends an appropriate error message when given a valid but non-existent id", () => {
