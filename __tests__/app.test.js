@@ -50,6 +50,9 @@ describe("/api/reviews", () => {
           reviews: expect.any(Array),
         });
         expect(res.body.reviews.length).toBe(13);
+        expect(res.body.reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
 
         res.body.reviews.forEach((review) => {
           expect(review).toEqual({
