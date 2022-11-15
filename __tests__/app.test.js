@@ -77,15 +77,16 @@ describe("/api/reviews/:review_id", () => {
       .expect(200)
       .then((res) => {
         expect(res.body.review).toEqual({
-          review_id: expect.any(Number),
-          title: expect.any(String),
-          review_body: expect.any(String),
-          owner: expect.any(String),
-          category: expect.any(String),
-          review_img_url: expect.any(String),
-          created_at: expect.any(String),
-          votes: expect.any(Number),
-          designer: expect.any(String),
+          review_id: 1,
+          title: "Agricola",
+          review_body: "Farmyard fun!",
+          owner: "mallionaire",
+          category: "euro game",
+          review_img_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          created_at: "2021-01-18T10:00:20.514Z",
+          votes: 1,
+          designer: "Uwe Rosenberg",
         });
       });
   });
