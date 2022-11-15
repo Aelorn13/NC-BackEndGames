@@ -16,7 +16,15 @@ exports.fetchReviews = () => {
 };
 exports.fetchReviewById = (review_id) => {
   return db
-    .query(`SELECT * FROM reviews where review_id = $1;`, [review_id])
+    .query(
+      `SELECT reviews.review_id, title, review_body, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) as comment_count
+    FROM reviews
+    LEFT JOIN  comments
+    ON reviews.review_id = comments.review_Id
+    where reviews.review_Id= $1
+    GROUP BY reviews.review_id;`,
+      [review_id]
+    )
     .then((result) => {
       if (result.rows.length === 0) {
         return Promise.reject({ status: 404, msg: "review does not exist" });

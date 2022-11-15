@@ -87,6 +87,7 @@ describe("/api/reviews/:review_id", () => {
           created_at: "2021-01-18T10:00:20.514Z",
           votes: 1,
           designer: "Uwe Rosenberg",
+          comment_count: "0",
         });
       });
   });
