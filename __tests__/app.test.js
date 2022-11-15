@@ -112,7 +112,7 @@ describe("/api/reviews/:review_id", () => {
       .send({ inc_votes: 5 })
       .expect(200)
       .then((res) => {
-        expect(res.body.updatedReview.votes).toBe(6);
+        expect(res.body.review.votes).toBe(6);
       });
   });
   test("PATCH - 400: sends an appropriate error message when given an invalid id", () => {
@@ -137,6 +137,15 @@ describe("/api/reviews/:review_id", () => {
     return request(app)
       .patch("/api/reviews/1")
       .send({ inc_catttes: 5 })
+      .expect(406)
+      .then((res) => {
+        expect(res.body.msg).toBe("body misses required keys");
+      });
+  });
+  test("PATCH - 406: responds with error message if body does not have inc_votes key or it is not a number", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ inc_votes: "five" })
       .expect(406)
       .then((res) => {
         expect(res.body.msg).toBe("body misses required keys");
