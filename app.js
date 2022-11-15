@@ -6,6 +6,7 @@ const {
   getReviewById,
   getReviewCommentsById,
   postComment,
+  patchReview,
 } = require("./controllers/reviews.js");
 const app = express();
 app.use(express.json());
@@ -15,6 +16,7 @@ app.get("/api/reviews/:review_id", getReviewById);
 app.get("/api/reviews/:review_id/comments", getReviewCommentsById);
 app.post("/api/reviews/:review_id/comments", postComment);
 app.get("/api/users", getUsers);
+app.patch("/api/reviews/:review_id", patchReview);
 app.use((err, req, res, next) => {
   if (err.code === "22P02") res.status(400).send({ msg: "Invalid id" });
   else {

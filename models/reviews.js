@@ -67,3 +67,18 @@ exports.insertComment = (comment, review_id) => {
       return result.rows[0];
     });
 };
+exports.updateReview = (change, review_id) => {
+  if (!change || isNaN(change))
+    return Promise.reject({ status: 406, msg: "body misses required keys" });
+  return db
+    .query(
+      "UPDATE reviews set votes=votes+$1 WHERE review_id = $2 RETURNING*;",
+      [change, review_id]
+    )
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "review does not exist" });
+      }
+      return result.rows[0];
+    });
+};
