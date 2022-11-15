@@ -1,4 +1,5 @@
 const db = require("../db/connection.js");
+const { fetchUsers } = require("../models/users");
 exports.fetchReviews = () => {
   return db
     .query(
@@ -33,6 +34,34 @@ exports.fetchReviewCommentsById = (review_id) => {
       )
       .then((result) => {
         return result.rows;
+      });
+  });
+};
+exports.insertComment = (comment, review_id) => {
+  //check for username existing?
+  const { username, body } = comment;
+  if (!username || !body) {
+    return Promise.reject({ status: 406, msg: "body misses required keys" });
+  }
+  return fetchUsers().then((usersArr) => {
+    let flag = false;
+    for (const user of usersArr) {
+      if (user.username === username) {
+        flag = true;
+        break;
+      }
+    }
+    if (flag === false) {
+      return Promise.reject({ status: 406, msg: "this user does not exist" });
+    }
+
+    return db
+      .query(
+        `INSERT INTO comments(body, author, review_id) VALUES ($1, $2, $3) RETURNING *;`,
+        [body, username, review_id]
+      )
+      .then((result) => {
+        return result.rows[0];
       });
   });
 };

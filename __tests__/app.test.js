@@ -158,4 +158,70 @@ describe("/api/reviews/:review_id/comments", () => {
         expect(response.body.msg).toBe("Invalid id");
       });
   });
+  test("POST - 201: adds new comment to table and returns added object", () => {
+    const newComment = {
+      username: "mallionaire",
+      body: "good one",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((res) => {
+        expect(res.body.newComment).toEqual({
+          comment_id: expect.any(Number),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          review_id: 1,
+          author: newComment.username,
+          body: newComment.body,
+        });
+      });
+  });
+  test("POST - 406: returns an error message if request misses key values", () => {
+    const newComment = {
+      username: "mallionaire",
+      notAbody: "good one",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(406)
+      .then((res) => {
+        expect(res.body.msg).toBe("body misses required keys");
+      });
+  });
+  test("POST - 406: returns an error message if user with this username doest not exist", () => {
+    const newComment = {
+      username: "literallyNoOne",
+      body: "good one",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(406)
+      .then((res) => {
+        expect(res.body.msg).toBe("this user does not exist");
+      });
+  });
+});
+describe("/api/users", () => {
+  test("GET - 200: responds with an array of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          users: expect.any(Array),
+        });
+        expect(res.body.users.length).toBe(4);
+        res.body.users.forEach((review) => {
+          expect(review).toEqual({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
 });
