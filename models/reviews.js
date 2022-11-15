@@ -23,3 +23,16 @@ exports.fetchReviewById = (review_id) => {
       return result.rows[0];
     });
 };
+
+exports.fetchReviewCommentsById = (review_id) => {
+  return this.fetchReviewById(review_id).then(() => {
+    return db
+      .query(
+        `SELECT * FROM comments where review_id = $1 ORDER BY created_at;`,
+        [review_id]
+      )
+      .then((result) => {
+        return result.rows;
+      });
+  });
+};
