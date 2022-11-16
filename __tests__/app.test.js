@@ -53,7 +53,6 @@ describe("/api/reviews", () => {
         expect(res.body.reviews).toBeSortedBy("created_at", {
           descending: true,
         });
-
         res.body.reviews.forEach((review) => {
           expect(review).toEqual({
             review_id: expect.any(Number),
@@ -69,7 +68,110 @@ describe("/api/reviews", () => {
         });
       });
   });
+
+  test("GET - 200: responds with an array of reviews each item in array have required keys and count of comments for each review using specific category query", () => {
+    return request(app)
+      .get("/api/reviews?category=dexterity")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          reviews: expect.any(Array),
+        });
+        expect(res.body.reviews.length).toBe(1);
+        expect(res.body.reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
+        res.body.reviews.forEach((review) => {
+          expect(review).toEqual({
+            review_id: expect.any(Number),
+            title: expect.any(String),
+            owner: expect.any(String),
+            category: "dexterity",
+            review_img_url: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            designer: expect.any(String),
+            comment_count: expect.any(String),
+          });
+        });
+      });
+  });
+  test("GET - 200: responds with an array of reviews each item in array have required keys and count of comments for each review using order query", () => {
+    return request(app)
+      .get("/api/reviews?order=ASC")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          reviews: expect.any(Array),
+        });
+        expect(res.body.reviews.length).toBe(13);
+        expect(res.body.reviews).toBeSortedBy("created_at", {
+          descending: false,
+        });
+      });
+  });
+
+  test("GET - 200: responds with an array of reviews each item in array have required keys and count of comments for each review using sort by query", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=category")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          reviews: expect.any(Array),
+        });
+        expect(res.body.reviews.length).toBe(13);
+        expect(res.body.reviews).toBeSortedBy("category", {
+          descending: true,
+        });
+      });
+  });
+  test("GET - 200: responds with an array of reviews each item in array have required keys and count of comments for each review using all queries possible", () => {
+    return request(app)
+      .get("/api/reviews?category=social+deduction&order=ASC&sort_by=category")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          reviews: expect.any(Array),
+        });
+        expect(res.body.reviews.length).toBe(11);
+        expect(res.body.reviews).toBeSortedBy("category", {
+          descending: false,
+        });
+        res.body.reviews.forEach((review) => {
+          expect(review).toEqual({
+            review_id: expect.any(Number),
+            title: expect.any(String),
+            owner: expect.any(String),
+            category: "social deduction",
+            review_img_url: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            designer: expect.any(String),
+            comment_count: expect.any(String),
+          });
+        });
+      });
+  });
+
+  test("GET - 400: INVALID ORDER QUERY", () => {
+    return request(app)
+      .get("/api/reviews?order=blahblahblah")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid order query");
+      });
+  });
+
+  test("GET - 400: INVALID SORT QUERY", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=blahblahblah")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid sort query");
+      });
+  });
 });
+
 describe("/api/reviews/:review_id", () => {
   test("GET - 200: responds with a review object", () => {
     return request(app)

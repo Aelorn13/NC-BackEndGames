@@ -6,10 +6,15 @@ const {
   updateReview,
 } = require("../models/reviews");
 
-exports.getReviews = (req, res) => {
-  fetchReviews().then((reviews) => {
-    res.send({ reviews });
-  });
+exports.getReviews = (req, res, next) => {
+  const { category, sort_by, order } = req.query;
+  fetchReviews(category, sort_by, order)
+    .then((reviews) => {
+      res.send({ reviews });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 exports.getReviewById = (req, res, next) => {
   const { review_id } = req.params;

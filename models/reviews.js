@@ -1,18 +1,40 @@
 const db = require("../db/connection.js");
 const { fetchUsers } = require("../models/users");
-exports.fetchReviews = () => {
-  return db
-    .query(
-      `SELECT reviews.review_id, title, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) as comment_count
-        FROM reviews
-        LEFT JOIN  comments
-        ON reviews.review_id = comments.review_Id
-        GROUP BY reviews.review_id
-        ORDER BY created_at DESC;`
-    )
-    .then((result) => {
-      return result.rows;
-    });
+exports.fetchReviews = (category, sort_by = "created_at", order = "DESC") => {
+  const validColumns = [
+    "review_id",
+    "title",
+    "owner",
+    "category",
+    "review_img_url",
+    "created_at",
+    "votes",
+    "designer",
+    "comment_count",
+  ];
+  const validOrders = ["ASC", "DESC"];
+  if (!validColumns.includes(sort_by.toLowerCase())) {
+    return Promise.reject({ status: 400, msg: "Invalid sort query" });
+  }
+  if (!validOrders.includes(order.toUpperCase())) {
+    return Promise.reject({ status: 400, msg: "Invalid order query" });
+  }
+  const queryValues = [];
+
+  let queryStr = `SELECT reviews.review_id, title, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) as comment_count
+  FROM reviews
+  LEFT JOIN  comments
+  ON reviews.review_id = comments.review_Id`;
+  if (category) {
+    if (category.includes("+")) category = category.replace("+", " ");
+    queryStr += " WHERE reviews.category = $1";
+    queryValues.push(category);
+  }
+  queryStr += ` GROUP BY reviews.review_id ORDER BY ${sort_by} ${order}`;
+
+  return db.query(queryStr, queryValues).then((result) => {
+    return result.rows;
+  });
 };
 exports.fetchReviewById = (review_id) => {
   return db
