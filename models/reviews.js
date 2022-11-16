@@ -1,6 +1,8 @@
 const db = require("../db/connection.js");
 const { fetchUsers } = require("../models/users");
+const { checkCategoryExists } = require("../utils/dbUtils");
 exports.fetchReviews = (category, sort_by = "created_at", order = "DESC") => {
+  const promiseArr = [];
   const validColumns = [
     "review_id",
     "title",
@@ -29,11 +31,15 @@ exports.fetchReviews = (category, sort_by = "created_at", order = "DESC") => {
     if (category.includes("+")) category = category.replace("+", " ");
     queryStr += " WHERE reviews.category = $1";
     queryValues.push(category);
+    promiseArr[1] = checkCategoryExists(category);
   }
   queryStr += ` GROUP BY reviews.review_id ORDER BY ${sort_by} ${order}`;
 
-  return db.query(queryStr, queryValues).then((result) => {
-    return result.rows;
+  promiseArr[0] = db.query(queryStr, queryValues);
+
+  return Promise.all(promiseArr).then((results) => {
+    const reviews = results[0].rows;
+    return reviews;
   });
 };
 exports.fetchReviewById = (review_id) => {

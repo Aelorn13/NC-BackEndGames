@@ -36,13 +36,16 @@
     "queries": [],
     "exampleResponse": {
       "review": {
-        "title": "One Night Ultimate Werewolf",
-        "designer": "Akihisa Okui",
-        "owner": "happyamy2016",
-        "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-        "category": "hidden-roles",
-        "created_at": 1610964101251,
-        "votes": 5
+        "review_id": 1,
+        "title": "Culture a Love of Agriculture With Agricola",
+        "review_body": "You could sum up Agricola with the simple phrase 'Farmyeard Fun' but the mechanics and game play add so much more than that. You'll find yourself torn between breeding pigs, or sowing crops. Its joyeous and rewarding and it makes you think of time spent outside, which is much harder to do these days!",
+        "owner": "tickle122",
+        "category": "strategy",
+        "review_img_url": "https://images.pexels.com/photos/4917821/pexels-photo-4917821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        "created_at": "2021-01-18T10:00:20.514Z",
+        "votes": 1,
+        "designer": "Uwe Rosenberg",
+        "comment_count": "3"
       }
     }
   },
@@ -52,7 +55,28 @@
     "exampleResponse": {
       "comments": [
         {
-          //tbd
+          "comment_id": 61,
+          "body": "Consequat nisi dolor nulla esse sunt eu ipsum laborum deserunt duis. Ffugiat sint et proident ex do consequat est. Nisi minim laboris mollit cupidatat?",
+          "review_id": 1,
+          "author": "weegembump",
+          "votes": 1,
+          "created_at": "2021-03-27T14:15:36.110Z"
+        },
+        {
+          "comment_id": 60,
+          "body": "Laboris nostrud ea ex occaecat aute quis consectetur anim.",
+          "review_id": 1,
+          "author": "cooljmessy",
+          "votes": 17,
+          "created_at": "2021-03-27T14:15:38.110Z"
+        },
+        {
+          "comment_id": 59,
+          "body": "Quis duis mollit ad enim deserunt.",
+          "review_id": 1,
+          "author": "jessjelly",
+          "votes": 3,
+          "created_at": "2021-03-27T19:48:58.110Z"
         }
       ]
     }
@@ -63,7 +87,9 @@
     "exampleResponse": {
       "users": [
         {
-          //tbd
+          "username": "tickle122",
+          "name": "Tom Tickle",
+          "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/d/d6/Mr-Tickle-9a.png/revision/latest?cb=20180127221953"
         }
       ]
     }
@@ -72,22 +98,36 @@
     "description": "serves an adding new comment in comments table",
     "queries": [],
     "exampleResponse": {
-      "comment": [
-        {
-          //tbd
-        }
-      ]
+      "newComment": {
+        "comment_id": 62,
+        "body": "new comment",
+        "review_id": 1,
+        "author": "grumpy19",
+        "votes": 0,
+        "created_at": "2022-11-16T09:46:07.646Z"
+      }
     }
   },
   "PATCH api/reviews/:review_id": {
-    "description": "serves an updating the votes property of the review with specified id ",
+    "description": "serves an updating 'votes' property of the review with specified id ",
     "queries": [],
     "exampleResponse": {
-      "review": [
-        {
-          //tbd
-        }
-      ]
+      "review": {
+        "review_id": 1,
+        "title": "Culture a Love of Agriculture With Agricola",
+        "category": "strategy",
+        "designer": "Uwe Rosenberg",
+        "owner": "tickle122",
+        "review_body": "You could sum up Agricola with the simple phrase 'Farmyeard Fun' but the mechanics and game play add so much more than that. You'll find yourself torn between breeding pigs, or sowing crops. Its joyeous and rewarding and it makes you think of time spent outside, which is much harder to do these days!",
+        "review_img_url": "https://images.pexels.com/photos/4917821/pexels-photo-4917821.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+        "created_at": "2021-01-18T10:00:20.514Z",
+        "votes": 11
+      }
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "serves an deleting comment with specified id ",
+    "queries": [],
+    "exampleResponse": {}
   }
 }

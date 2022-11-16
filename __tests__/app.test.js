@@ -10,7 +10,6 @@ afterAll(() => {
 beforeEach(() => {
   return seed(data);
 });
-
 describe("/api/categories", () => {
   test("GET - 200: responds with an array of categories each item in array have slug and decription keys", () => {
     return request(app)
@@ -66,6 +65,26 @@ describe("/api/reviews", () => {
             comment_count: expect.any(String),
           });
         });
+      });
+  });
+  test("GET - 200: responds with an empty array if category does not have any reviews", () => {
+    return request(app)
+      .get("/api/reviews?category=children's+games")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          reviews: expect.any(Array),
+        });
+        expect(res.body.reviews.length).toBe(0);
+      });
+  });
+
+  test("GET - 404: sends an appropriate error message when given a category that does not exist", () => {
+    return request(app)
+      .get("/api/reviews?category=BLAHBLAHBLAH")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("category not exist");
       });
   });
 
