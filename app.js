@@ -17,6 +17,9 @@ app.get("/api/reviews/:review_id/comments", getReviewCommentsById);
 app.get("/api/users", getUsers);
 app.post("/api/reviews/:review_id/comments", postComment);
 app.patch("/api/reviews/:review_id", patchReview);
+app.all("/*", (req, res) => {
+  res.status(404).send({ msg: "Route not found" });
+});
 app.use((err, req, res, next) => {
   if (err.code === "22P02") res.status(400).send({ msg: "Invalid id" });
   else {
@@ -24,9 +27,11 @@ app.use((err, req, res, next) => {
   }
 });
 app.use((err, req, res, next) => {
-  res.status(err.status).send({ msg: err.msg });
+  if (err.status && err.msg) res.status(err.status).send({ msg: err.msg });
+  else next(err);
 });
-app.all("/*", (req, res) => {
-  res.status(404).send({ msg: "Route not found" });
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(500).send();
 });
 module.exports = app;

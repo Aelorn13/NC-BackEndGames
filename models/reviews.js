@@ -1,18 +1,46 @@
 const db = require("../db/connection.js");
 const { fetchUsers } = require("../models/users");
-exports.fetchReviews = () => {
-  return db
-    .query(
-      `SELECT reviews.review_id, title, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) as comment_count
-        FROM reviews
-        LEFT JOIN  comments
-        ON reviews.review_id = comments.review_Id
-        GROUP BY reviews.review_id
-        ORDER BY created_at DESC;`
-    )
-    .then((result) => {
-      return result.rows;
-    });
+const { checkCategoryExists } = require("../utils/dbUtils");
+exports.fetchReviews = (category, sort_by = "created_at", order = "DESC") => {
+  const promiseArr = [];
+  const validColumns = [
+    "review_id",
+    "title",
+    "owner",
+    "category",
+    "review_img_url",
+    "created_at",
+    "votes",
+    "designer",
+    "comment_count",
+  ];
+  const validOrders = ["ASC", "DESC"];
+  if (!validColumns.includes(sort_by.toLowerCase())) {
+    return Promise.reject({ status: 400, msg: "Invalid sort query" });
+  }
+  if (!validOrders.includes(order.toUpperCase())) {
+    return Promise.reject({ status: 400, msg: "Invalid order query" });
+  }
+  const queryValues = [];
+
+  let queryStr = `SELECT reviews.review_id, title, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) as comment_count
+  FROM reviews
+  LEFT JOIN  comments
+  ON reviews.review_id = comments.review_Id`;
+  if (category) {
+    if (category.includes("+")) category = category.replace("+", " ");
+    queryStr += " WHERE reviews.category = $1";
+    queryValues.push(category);
+    promiseArr[1] = checkCategoryExists(category);
+  }
+  queryStr += ` GROUP BY reviews.review_id ORDER BY ${sort_by} ${order}`;
+
+  promiseArr[0] = db.query(queryStr, queryValues);
+
+  return Promise.all(promiseArr).then((results) => {
+    const reviews = results[0].rows;
+    return reviews;
+  });
 };
 exports.fetchReviewById = (review_id) => {
   return db
