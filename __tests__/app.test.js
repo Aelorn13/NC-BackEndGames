@@ -434,3 +434,26 @@ describe("/api/health", () => {
       });
   });
 });
+describe("/api/users/:username", () => {
+  test("GET - 200: responds a user object", () => {
+    return request(app)
+      .get("/api/users/mallionaire")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.user).toEqual({
+          username: "mallionaire",
+          name: "haz",
+          avatar_url:
+            "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+        });
+      });
+  });
+  test("GET - 404: responds with an appropriate error message when given a non-existent id", () => {
+    return request(app)
+      .get("/api/users/blahblahblah")
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("user does not exist");
+      });
+  });
+});
