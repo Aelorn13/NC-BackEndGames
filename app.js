@@ -22,6 +22,9 @@ app.post("/api/reviews/:review_id/comments", postComment);
 app.patch("/api/reviews/:review_id", patchReview);
 app.delete("/api/comments/:comment_id", deleteCommentById);
 app.get("/api", getApi);
+app.get("/api/health", (req, res) => {
+  res.status(200).send({ msg: "server up and running" });
+});
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });
 });

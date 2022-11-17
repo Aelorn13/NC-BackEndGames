@@ -1,6 +1,13 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "serves up a json representation of all the available endpoints of the api",
+    "queries": [],
+    "exampleResponse": { "endpoints": "this whole file" }
+  },
+  "GET /api/health": {
+    "description": "serves up a message that server up and running",
+    "queries": [],
+    "exampleResponse": { "msg": "server up and running" }
   },
   "GET /api/categories": {
     "description": "serves an array of all categories",
