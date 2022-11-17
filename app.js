@@ -2,6 +2,7 @@ const express = require("express");
 const { getCategories } = require("./controllers/categories.js");
 const { getUsers } = require("./controllers/users.js");
 const { deleteCommentById } = require("./controllers/comments.js");
+const { getApi } = require("./controllers/api.js");
 
 const {
   getReviews,
@@ -20,6 +21,7 @@ app.get("/api/users", getUsers);
 app.post("/api/reviews/:review_id/comments", postComment);
 app.patch("/api/reviews/:review_id", patchReview);
 app.delete("/api/comments/:comment_id", deleteCommentById);
+app.get("/api", getApi);
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });
 });
