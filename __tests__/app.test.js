@@ -424,3 +424,13 @@ describe("/api/", () => {
       });
   });
 });
+describe("/api/health", () => {
+  test("GET - 200: responds with a message that server works", () => {
+    return request(app)
+      .get("/api/health")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.msg).toBe("server up and running");
+      });
+  });
+});
