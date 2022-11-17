@@ -413,6 +413,51 @@ describe("/api/comments/:comment_id", () => {
         expect(response.body.msg).toBe("Invalid id");
       });
   });
+  test("PATCH - 200: responds with updated object", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: 5 })
+      .expect(200)
+      .then((res) => {
+        expect(res.body.comment.votes).toBe(21);
+      });
+  });
+  test("PATCH - 400: sends an appropriate error message when given an invalid id", () => {
+    return request(app)
+      .patch("/api/comments/one")
+      .send({ inc_votes: 5 })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid id");
+      });
+  });
+  test("PATCH - 404: sends an appropriate error message when given a valid but non-existent id", () => {
+    return request(app)
+      .patch("/api/comments/999999")
+      .send({ inc_votes: 5 })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("comment does not exist");
+      });
+  });
+  test("PATCH - 406: responds with error message if body does not have inc_votes key", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_catttes: 5 })
+      .expect(406)
+      .then((res) => {
+        expect(res.body.msg).toBe("body misses required keys");
+      });
+  });
+  test("PATCH - 406: responds with error message if body does not have inc_votes key or it is not a number", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: "five" })
+      .expect(406)
+      .then((res) => {
+        expect(res.body.msg).toBe("body misses required keys");
+      });
+  });
 });
 describe("/api/", () => {
   test("GET - 200: responds with an object of endpoints", () => {
