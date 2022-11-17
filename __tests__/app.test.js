@@ -392,3 +392,24 @@ describe("/api/users", () => {
       });
   });
 });
+describe("/api/comments/:comment_id", () => {
+  test("DELETE:204 deletes the specified comment and sends no body back", () => {
+    return request(app).delete("/api/comments/3").expect(204);
+  });
+  test("DELETE:404 responds with an appropriate error message when given a non-existent id", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("comment does not exist");
+      });
+  });
+  test("DELETE:400 responds with an appropriate error message when given an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/one")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid id");
+      });
+  });
+});
