@@ -1,30 +1,14 @@
 const express = require("express");
-const { getCategories } = require("./controllers/categories.js");
-const { getUsers } = require("./controllers/users.js");
-const { deleteCommentById } = require("./controllers/comments.js");
-const { getApi } = require("./controllers/api.js");
+const apiRouter = require("./routes/api");
 
-const {
-  getReviews,
-  getReviewById,
-  getReviewCommentsById,
-  postComment,
-  patchReview,
-} = require("./controllers/reviews.js");
 const app = express();
 app.use(express.json());
-app.get("/api/categories", getCategories);
-app.get("/api/reviews", getReviews);
-app.get("/api/reviews/:review_id", getReviewById);
-app.get("/api/reviews/:review_id/comments", getReviewCommentsById);
-app.get("/api/users", getUsers);
-app.post("/api/reviews/:review_id/comments", postComment);
-app.patch("/api/reviews/:review_id", patchReview);
-app.delete("/api/comments/:comment_id", deleteCommentById);
-app.get("/api", getApi);
+app.use("/api", apiRouter);
+
 app.get("/api/health", (req, res) => {
   res.status(200).send({ msg: "server up and running" });
 });
+
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });
 });
