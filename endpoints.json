@@ -126,7 +126,7 @@
     }
   },
   "DELETE /api/comments/:comment_id": {
-    "description": "serves an deleting comment with specified id ",
+    "description": "serves an deleting comment with specified id",
     "queries": [],
     "exampleResponse": {}
   }

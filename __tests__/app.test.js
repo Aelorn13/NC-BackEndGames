@@ -3,6 +3,7 @@ const request = require("supertest");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data/index");
+const endpoints = require("../endpoints.json");
 afterAll(() => {
   return db.end();
 });
@@ -410,6 +411,16 @@ describe("/api/comments/:comment_id", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("Invalid id");
+      });
+  });
+});
+describe("/api/", () => {
+  test("GET - 200: responds with an object of endpoints", () => {
+    return request(app)
+      .get("/api/")
+      .expect(200)
+      .then((res) => {
+        expect(res.body.endpoints).toEqual(endpoints);
       });
   });
 });
