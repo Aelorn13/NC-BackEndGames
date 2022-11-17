@@ -1,8 +1,8 @@
-There is the link to hosted version -
+There is the link to hosted version - https://dead-pink-hare-garb.cyclic.app/api/
 
 This is a server project for the northcoders board games database.
 
-To clone this project, you need to click on the "Code" button on the site, copy the link and write "git clone your_link" in the terminal.
+To clone this project, you need to click on the "Code" button on the site, copy the link and write "git clone your_copied_link" in the terminal.
 
 To install all dependencies in the project directory, you need to write the "npm install" command in the terminal.
 
