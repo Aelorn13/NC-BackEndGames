@@ -29,6 +29,35 @@ describe("/api/categories", () => {
         });
       });
   });
+  test("POST - 201: adds new category to table and returns added object", () => {
+    const newCategory = {
+      slug: "jungle hunting",
+      description: "good one",
+    };
+    return request(app)
+      .post("/api/categories")
+      .send(newCategory)
+      .expect(201)
+      .then((res) => {
+        expect(res.body.category).toEqual({
+          slug: newCategory.slug,
+          description: newCategory.description,
+        });
+      });
+  });
+  test("POST - 406: returns an error message if request misses key values", () => {
+    const newCategory = {
+      slug: "jungle hunting",
+      distraction: "good one",
+    };
+    return request(app)
+      .post("/api/categories")
+      .send(newCategory)
+      .expect(406)
+      .then((res) => {
+        expect(res.body.msg).toBe("body misses required keys");
+      });
+  });
 });
 describe("/api/not-a-real-path", () => {
   test("GET - 404: responds with an error message if asking for non-existent path", () => {
