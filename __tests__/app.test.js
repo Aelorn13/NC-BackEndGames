@@ -85,7 +85,7 @@ describe("/api/reviews", () => {
       .get("/api/reviews?category=BLAHBLAHBLAH")
       .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("category not exist");
+        expect(res.body.msg).toBe("category does not exist");
       });
   });
 
@@ -188,6 +188,77 @@ describe("/api/reviews", () => {
       .expect(400)
       .then((res) => {
         expect(res.body.msg).toBe("Invalid sort query");
+      });
+  });
+
+  test("POST - 201: adds new review to table and returns added object", () => {
+    const newReview = {
+      title: "this is a title",
+      owner: "mallionaire",
+      review_body: "good one",
+      designer: "designer",
+      category: "dexterity",
+    };
+    return request(app)
+      .post("/api/reviews/")
+      .send(newReview)
+      .expect(201)
+      .then((res) => {
+        expect(res.body.review).toEqual({
+          review_id: expect.any(Number),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          comment_count: expect.any(String),
+          review_img_url: expect.any(String),
+          ...newReview,
+        });
+      });
+  });
+  test("POST - 406: returns an error message if request misses key values", () => {
+    const newReview = {
+      owner: "mallionaire",
+      review_body: "good one",
+      designer: "designer",
+      category: "dexterity",
+    };
+    return request(app)
+      .post("/api/reviews/")
+      .send(newReview)
+      .expect(406)
+      .then((res) => {
+        expect(res.body.msg).toBe("body misses required keys");
+      });
+  });
+  test("POST - 404: returns an error message if user with this username doest not exist", () => {
+    const newReview = {
+      title: "this is a title",
+      owner: "bublgum",
+      review_body: "good one",
+      designer: "designer",
+      category: "dexterity",
+    };
+    return request(app)
+      .post("/api/reviews/")
+      .send(newReview)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("User does not exist");
+      });
+  });
+  test("POST - 404: returns an error message if category doest not exist", () => {
+    const newReview = {
+      title: "this is a title",
+      owner: "mallionaire",
+      review_body: "good one",
+      designer: "designer",
+      category: "NONEXISTENTONE",
+    };
+    return request(app)
+      .post("/api/reviews/")
+      .send(newReview)
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("category does not exist");
       });
   });
 });
@@ -336,7 +407,7 @@ describe("/api/reviews/:review_id/comments", () => {
       .send(newComment)
       .expect(201)
       .then((res) => {
-        expect(res.body.newComment).toEqual({
+        expect(res.body.comment).toEqual({
           comment_id: expect.any(Number),
           created_at: expect.any(String),
           votes: expect.any(Number),
@@ -359,7 +430,7 @@ describe("/api/reviews/:review_id/comments", () => {
         expect(res.body.msg).toBe("body misses required keys");
       });
   });
-  test("POST - 406: returns an error message if user with this username doest not exist", () => {
+  test("POST - 404: returns an error message if user with this username doest not exist", () => {
     const newComment = {
       username: "literallyNoOne",
       body: "good one",
@@ -367,9 +438,9 @@ describe("/api/reviews/:review_id/comments", () => {
     return request(app)
       .post("/api/reviews/1/comments")
       .send(newComment)
-      .expect(406)
+      .expect(404)
       .then((res) => {
-        expect(res.body.msg).toBe("this user does not exist");
+        expect(res.body.msg).toBe("User does not exist");
       });
   });
 });
