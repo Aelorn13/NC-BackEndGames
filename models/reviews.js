@@ -1,7 +1,12 @@
 const db = require("../db/connection.js");
-const { fetchUsers } = require("../models/users");
 const { checkCategoryExists, checkUserExists } = require("../utils/dbUtils");
-exports.fetchReviews = (category, sort_by = "created_at", order = "DESC") => {
+exports.fetchReviews = (
+  category,
+  sort_by = "created_at",
+  order = "DESC",
+  limit = 10,
+  p = 0
+) => {
   const promiseArr = [];
   const validColumns = [
     "review_id",
@@ -15,6 +20,9 @@ exports.fetchReviews = (category, sort_by = "created_at", order = "DESC") => {
     "comment_count",
   ];
   const validOrders = ["ASC", "DESC"];
+  if (isNaN(limit) || isNaN(p)) {
+    return Promise.reject({ status: 400, msg: "Invalid limit or page query" });
+  }
   if (!validColumns.includes(sort_by.toLowerCase())) {
     return Promise.reject({ status: 400, msg: "Invalid sort query" });
   }
@@ -22,21 +30,25 @@ exports.fetchReviews = (category, sort_by = "created_at", order = "DESC") => {
     return Promise.reject({ status: 400, msg: "Invalid order query" });
   }
   const queryValues = [];
-
-  let queryStr = `SELECT reviews.review_id, title, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) as comment_count
+  let countQueryStr = `(SELECT count(*) :: INT AS total_count FROM reviews)`;
+  let queryStr = `SELECT reviews.review_id, title, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) :: INT AS comment_count, ${countQueryStr}
   FROM reviews
   LEFT JOIN  comments
   ON reviews.review_id = comments.review_Id`;
   if (category) {
     if (category.includes("+")) category = category.replace("+", " ");
-    queryStr += " WHERE reviews.category = $1";
+    countQueryStr =
+      "(SELECT count(*) :: INT AS total_count FROM reviews where reviews.category = $1)";
+    queryStr = `SELECT reviews.review_id, title, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) :: INT AS comment_count, ${countQueryStr}
+    FROM reviews
+    LEFT JOIN  comments
+    ON reviews.review_id = comments.review_Id WHERE reviews.category = $1`;
     queryValues.push(category);
     promiseArr[1] = checkCategoryExists(category);
   }
-  queryStr += ` GROUP BY reviews.review_id ORDER BY ${sort_by} ${order}`;
-
+  queryStr += ` GROUP BY reviews.review_id ORDER BY ${sort_by} ${order}
+  LIMIT ${limit} OFFSET ${limit * p}`;
   promiseArr[0] = db.query(queryStr, queryValues);
-
   return Promise.all(promiseArr).then((results) => {
     const reviews = results[0].rows;
     return reviews;
@@ -45,7 +57,7 @@ exports.fetchReviews = (category, sort_by = "created_at", order = "DESC") => {
 exports.fetchReviewById = (review_id) => {
   return db
     .query(
-      `SELECT reviews.review_id, title, review_body, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) as comment_count
+      `SELECT reviews.review_id, title, review_body, owner, category, review_img_url, reviews.created_at, reviews.votes, designer, COUNT(comments.comment_id) :: INT AS comment_count
     FROM reviews
     LEFT JOIN  comments
     ON reviews.review_id = comments.review_Id
@@ -73,7 +85,6 @@ exports.fetchReviewCommentsById = (review_id) => {
   });
 };
 exports.insertComment = (comment, review_id) => {
-  //checkUserExists
   const { username, body } = comment;
   if (!username || !body) {
     return Promise.reject({ status: 406, msg: "body misses required keys" });
