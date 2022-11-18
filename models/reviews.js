@@ -72,11 +72,16 @@ exports.fetchReviewById = (review_id) => {
       return result.rows[0];
     });
 };
-exports.fetchReviewCommentsById = (review_id) => {
+exports.fetchReviewCommentsById = (review_id, limit = 10, p = 0) => {
+  if (isNaN(limit) || isNaN(p)) {
+    return Promise.reject({ status: 400, msg: "Invalid limit or page query" });
+  }
   return this.fetchReviewById(review_id).then(() => {
     return db
       .query(
-        `SELECT * FROM comments where review_id = $1 ORDER BY created_at;`,
+        `SELECT * FROM comments where review_id = $1 ORDER BY created_at LIMIT ${limit} OFFSET ${
+          limit * p
+        };`,
         [review_id]
       )
       .then((result) => {
