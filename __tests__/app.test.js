@@ -162,6 +162,22 @@ describe("/api/reviews", () => {
         });
       });
   });
+  test("GET - 400: sends an appropriate error message when limit or p is not a number", () => {
+    return request(app)
+      .get("/api/reviews?limit=bleh")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid limit or page query");
+      });
+  });
+  test("GET - 400: sends an appropriate error message when limit or p is not a number", () => {
+    return request(app)
+      .get("/api/reviews?p=bleh")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid limit or page query");
+      });
+  });
   test("GET - 200: responds with an array of reviews each item in array have required keys and count of comments for each review using all queries possible", () => {
     return request(app)
       .get("/api/reviews?category=social+deduction&order=ASC&sort_by=category")
@@ -386,6 +402,45 @@ describe("/api/reviews/:review_id/comments", () => {
             votes: expect.any(Number),
           });
         });
+      });
+  });
+
+  test("GET - 200: responds with an array of comments if using limit and p query", () => {
+    return request(app)
+      .get("/api/reviews/2/comments?limit=2&p=1")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          comments: expect.any(Array),
+        });
+        expect(res.body.comments.length).toBe(1);
+        expect(res.body.comments).toBeSortedBy("created_at");
+        res.body.comments.forEach((review) => {
+          expect(review).toEqual({
+            comment_id: expect.any(Number),
+            review_id: 2,
+            body: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("GET - 400: sends an appropriate error message when limit or p is not a number", () => {
+    return request(app)
+      .get("/api/reviews/2/comments?limit=bleh")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid limit or page query");
+      });
+  });
+  test("GET - 400: sends an appropriate error message when limit or p is not a number", () => {
+    return request(app)
+      .get("/api/reviews/2/comments?p=bleh")
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Invalid limit or page query");
       });
   });
   test("GET - 200: responds with an empty array if reviews does not have any comments", () => {
