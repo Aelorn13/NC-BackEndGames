@@ -1,6 +1,6 @@
 const db = require("../db/connection.js");
 const { fetchUsers } = require("../models/users");
-const { checkCategoryExists } = require("../utils/dbUtils");
+const { checkCategoryExists, checkUserExists } = require("../utils/dbUtils");
 exports.fetchReviews = (category, sort_by = "created_at", order = "DESC") => {
   const promiseArr = [];
   const validColumns = [
@@ -60,7 +60,6 @@ exports.fetchReviewById = (review_id) => {
       return result.rows[0];
     });
 };
-
 exports.fetchReviewCommentsById = (review_id) => {
   return this.fetchReviewById(review_id).then(() => {
     return db
@@ -74,33 +73,20 @@ exports.fetchReviewCommentsById = (review_id) => {
   });
 };
 exports.insertComment = (comment, review_id) => {
+  //checkUserExists
   const { username, body } = comment;
   if (!username || !body) {
     return Promise.reject({ status: 406, msg: "body misses required keys" });
   }
-  return fetchUsers()
-    .then((usersArr) => {
-      let flag = false;
-      for (const user of usersArr) {
-        if (user.username === username) {
-          flag = true;
-          break;
-        }
-      }
-      return flag;
+  return checkUserExists(username)
+    .then(() => {
+      return db.query(
+        `INSERT INTO comments(body, author, review_id) VALUES ($1, $2, $3) RETURNING *;`,
+        [body, username, review_id]
+      );
     })
-    .then((flag) => {
-      if (flag === false) {
-        return Promise.reject({ status: 406, msg: "this user does not exist" });
-      } else {
-        return db.query(
-          `INSERT INTO comments(body, author, review_id) VALUES ($1, $2, $3) RETURNING *;`,
-          [body, username, review_id]
-        );
-      }
-    })
-    .then((result) => {
-      return result.rows[0];
+    .then((res) => {
+      return res.rows[0];
     });
 };
 exports.updateReview = (change, review_id) => {
@@ -116,5 +102,28 @@ exports.updateReview = (change, review_id) => {
         return Promise.reject({ status: 404, msg: "review does not exist" });
       }
       return result.rows[0];
+    });
+};
+exports.insertReview = (review) => {
+  const { title, owner, review_body, designer, category } = review;
+  if (!title || !owner || !review_body || !designer || !category) {
+    return Promise.reject({ status: 406, msg: "body misses required keys" });
+  }
+  const promiseArr = [];
+  const queryInsertStr =
+    "INSERT INTO reviews(title, owner, review_body, designer, category) VALUES ($1, $2, $3, $4, $5) RETURNING *;";
+  const queryInsertValues = [title, owner, review_body, designer, category];
+
+  promiseArr.push(checkUserExists(owner));
+  promiseArr.push(checkCategoryExists(category));
+  return Promise.all(promiseArr)
+    .then(() => {
+      return db.query(queryInsertStr, queryInsertValues);
+    })
+    .then((results) => {
+      return results.rows[0].review_id;
+    })
+    .then((review_id) => {
+      return this.fetchReviewById(review_id);
     });
 };
