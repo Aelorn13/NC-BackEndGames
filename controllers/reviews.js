@@ -8,8 +8,8 @@ const {
 } = require("../models/reviews");
 
 exports.getReviews = (req, res, next) => {
-  const { category, sort_by, order } = req.query;
-  fetchReviews(category, sort_by, order)
+  const { category, sort_by, order, limit, p } = req.query;
+  fetchReviews(category, sort_by, order, limit, p)
     .then((reviews) => {
       res.send({ reviews });
     })

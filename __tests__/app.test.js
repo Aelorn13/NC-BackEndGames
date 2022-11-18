@@ -49,7 +49,7 @@ describe("/api/reviews", () => {
         expect(res.body).toEqual({
           reviews: expect.any(Array),
         });
-        expect(res.body.reviews.length).toBe(13);
+        expect(res.body.reviews[0].total_count).toBe(13);
         expect(res.body.reviews).toBeSortedBy("created_at", {
           descending: true,
         });
@@ -63,7 +63,8 @@ describe("/api/reviews", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             designer: expect.any(String),
-            comment_count: expect.any(String),
+            comment_count: expect.any(Number),
+            total_count: expect.any(Number),
           });
         });
       });
@@ -111,7 +112,8 @@ describe("/api/reviews", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             designer: expect.any(String),
-            comment_count: expect.any(String),
+            comment_count: expect.any(Number),
+            total_count: expect.any(Number),
           });
         });
       });
@@ -124,7 +126,7 @@ describe("/api/reviews", () => {
         expect(res.body).toEqual({
           reviews: expect.any(Array),
         });
-        expect(res.body.reviews.length).toBe(13);
+        expect(res.body.reviews[0].total_count).toBe(13);
         expect(res.body.reviews).toBeSortedBy("created_at", {
           descending: false,
         });
@@ -139,7 +141,22 @@ describe("/api/reviews", () => {
         expect(res.body).toEqual({
           reviews: expect.any(Array),
         });
-        expect(res.body.reviews.length).toBe(13);
+        expect(res.body.reviews[0].total_count).toBe(13);
+        expect(res.body.reviews).toBeSortedBy("category", {
+          descending: true,
+        });
+      });
+  });
+  test("GET - 200: responds with an array of reviews each item in array have required keys and count of comments for each review using limit and p query", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=category&limit=2&p=6")
+      .expect(200)
+      .then((res) => {
+        expect(res.body).toEqual({
+          reviews: expect.any(Array),
+        });
+        expect(res.body.reviews.length).toBe(1);
+        expect(res.body.reviews[0].total_count).toBe(13);
         expect(res.body.reviews).toBeSortedBy("category", {
           descending: true,
         });
@@ -153,7 +170,7 @@ describe("/api/reviews", () => {
         expect(res.body).toEqual({
           reviews: expect.any(Array),
         });
-        expect(res.body.reviews.length).toBe(11);
+        expect(res.body.reviews[0].total_count).toBe(11);
         expect(res.body.reviews).toBeSortedBy("category", {
           descending: false,
         });
@@ -167,7 +184,8 @@ describe("/api/reviews", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             designer: expect.any(String),
-            comment_count: expect.any(String),
+            comment_count: expect.any(Number),
+            total_count: expect.any(Number),
           });
         });
       });
@@ -208,7 +226,7 @@ describe("/api/reviews", () => {
           review_id: expect.any(Number),
           created_at: expect.any(String),
           votes: expect.any(Number),
-          comment_count: expect.any(String),
+          comment_count: expect.any(Number),
           review_img_url: expect.any(String),
           ...newReview,
         });
@@ -280,7 +298,7 @@ describe("/api/reviews/:review_id", () => {
           created_at: "2021-01-18T10:00:20.514Z",
           votes: 1,
           designer: "Uwe Rosenberg",
-          comment_count: "0",
+          comment_count: 0,
         });
       });
   });
