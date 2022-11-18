@@ -408,6 +408,25 @@ describe("/api/reviews/:review_id", () => {
         expect(res.body.msg).toBe("body misses required keys");
       });
   });
+  test("DELETE:204 deletes the specified review and sends no body back", () => {
+    return request(app).delete("/api/reviews/3").expect(204);
+  });
+  test("DELETE:404 responds with an appropriate error message when given a non-existent id", () => {
+    return request(app)
+      .delete("/api/reviews/999")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("review does not exist");
+      });
+  });
+  test("DELETE:400 responds with an appropriate error message when given an invalid id", () => {
+    return request(app)
+      .delete("/api/reviews/one")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid id");
+      });
+  });
 });
 
 describe("/api/reviews/:review_id/comments", () => {

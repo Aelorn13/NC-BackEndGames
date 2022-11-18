@@ -85,6 +85,11 @@
       }
     }
   },
+  "DELETE /api/reviews/:review_id": {
+    "description": "serves an deleting review with specified id",
+    "queries": [],
+    "exampleResponse": {}
+  },
   "GET /api/reviews/:review_id/comments": {
     "description": "serves an array of all comments for review with specific id",
     "queries": ["p", "limit"],
