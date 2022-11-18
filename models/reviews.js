@@ -143,3 +143,19 @@ exports.insertReview = (review) => {
       return this.fetchReviewById(review_id);
     });
 };
+exports.removeReviewById = (review_id) => {
+  return db
+    .query("DELETE FROM comments WHERE review_id = $1 RETURNING *;", [
+      review_id,
+    ])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "review does not exist" });
+      }
+    })
+    .then(() => {
+      return db.query("DELETE FROM REVIEWS WHERE review_id = $1 RETURNING *;", [
+        review_id,
+      ]);
+    });
+};
