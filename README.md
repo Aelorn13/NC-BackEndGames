@@ -1,6 +1,6 @@
 # README
 
-Link to the hosted version: https://dead-pink-hare-garb.cyclic.app/api/
+Link to the hosted version: https://dead-pink-hare-garb.cyclic.app/api/ or https://nc-backendgames-ael.onrender.com/
 
 This is a server project for the northcoders board games database.
 
